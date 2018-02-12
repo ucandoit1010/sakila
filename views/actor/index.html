@@ -1,0 +1,108 @@
+<div class="row mb-3">
+    <div class="col-md-10">
+        
+        <form class="form-inline">
+                <input type="hidden" id="crt_csrf" name="_csrf" value='${token}' />
+                <label class="sr-only" for="id_first_name">First Name</label>
+                <input type="text" class="form-control mr-sm-2" id="id_first_name" placeholder="First Name">
+                <label class="sr-only" for="id_last_name">Last Name</label>
+                <input type="text" class="form-control mr-sm-2" id="id_last_name" placeholder="Last Name">
+                <button id="btnSearch" type="button" class="btn btn-info">搜尋</button>
+                <button id="btnClear" type="button" class="btn btn-secondary ml-2">清除</button>
+                <button type="button" id="btn_add" class="btn btn-primary ml-2">新增</button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10 mb-3">
+        <table id="grid"></table>
+    </div>
+    
+</div>
+
+<div id="dialog" class="gj-display-none">
+    <div data-role="body">
+        <input type="hidden" id="ID" />
+        <div class="">
+            <input type="text" class="form-control mr-sm-2 mb-2" id="crt_first_name" placeholder="First Name">
+        </div>
+        <div class="gj-margin-top-20">
+            <input type="text" class="form-control mr-sm-2" id="crt_last_name" placeholder="Last Name">
+        </div>
+    </div>
+    <div data-role="footer">
+        <button type="button" id="btnSave" class="gj-button-md">Save</button>
+        <button type="button" id="btnCancel" class="gj-button-md">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+var dialog;
+var grid;
+$(function(){
+    // dialog.close();
+    grid = $('#grid').grid({
+        primaryKey:'actor_id',
+        uiLibrary: 'bootstrap4',
+        dataSource:'http://127.0.0.1:3311/api/actor/get',
+        columns: [
+            { field: 'actor_id', hidden:true },
+            { field: 'first_name',title:'First Name', sortable: true },
+            { field: 'last_name', title: 'Last Name', sortable: true },
+            { width:50 ,tmpl:'<span class="material-icons gj-cursor-pointer">delete</span>', align: 'center', sortable: false , events:{'click':delClick} }
+        ],
+        pager: { limit: 5 }
+    });
+
+    dialog = $('#dialog').dialog({
+        autoOpen: false,resizable: false,modal: true,width: 360
+    });
+
+    $('#btn_add').on('click', function () {
+        $('#crt_first_name').val('');
+        $('#crt_last_name').val('');
+        dialog.open('新增 Actor');
+    });
+    $('#btnClear').on('click',function(){
+        $('#id_first_name').val('');
+        $('#id_last_name').val('');
+    });
+    $('#btnSave').on('click', function(){
+            $.ajax({
+                url: 'http://127.0.0.1:3311/api/actor/save', 
+                data: JSON.stringify({ _csrf:$('#crt_csrf').val() ,firstName: $('#crt_first_name').val(), lastName:$('#crt_last_name').val()})
+            , method: 'POST',dataType:'json',contentType:'application/json'
+            }).done(function () {
+                dialog.close();
+                grid.reload();
+            }).fail(function () {
+                alert('Failed to save.');
+                dialog.close();
+            });
+
+    });
+    $('#btnSearch').on('click',function(){
+        grid.reload({ page: 1, firstName: $('#id_first_name').val(), lastName: $('#id_last_name').val() });
+    });
+    $('#btnCancel').on('click', function () {
+        dialog.close();
+    });
+
+});
+
+function delClick(e){
+    if (confirm('刪除資料？' + e.data.id)) {
+        $.ajax({ 
+            url: 'http://127.0.0.1:3311/api/actor/delete', dataType:'json',
+            data: JSON.stringify({ _csrf:$('#crt_csrf').val() ,id: e.data.id }), method: 'POST',contentType:'application/json' })
+        .done(function () {
+            grid.reload();
+        })
+        .fail(function () {
+            alert('Failed to delete.');
+        });
+    }
+
+}
+
+</script>

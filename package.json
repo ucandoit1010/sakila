@@ -1,0 +1,23 @@
+{
+  "name": "package",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "csurf": "^1.9.0",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-es6-template-engine": "^2.0.2",
+    "grunt-ejs-locals": "^0.1.1",
+    "mysql": "^2.15.0",
+    "mysql2": "^1.5.2",
+    "sequelize": "^4.32.7",
+    "sequelize-auto": "^0.4.29"
+  }
+}
