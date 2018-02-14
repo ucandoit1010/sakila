@@ -25,7 +25,15 @@ router.get('/get',function(req,resp){
 });
 
 router.post('/save',parseForm,csrfProtect,function(req,resp){
-    if(req.body.firstName && req.body.lastName){
+    if(req.body.id){
+        Actor.update(
+            {first_name : req.body.firstName,last_name : req.body.lastName},
+            {where : { actor_id : req.body.id }}).
+        then(function(actor){
+            resp.status(200).send(JSON.stringify({result : true}));
+        });
+    }else{
+
         Actor.create({
             first_name:req.body.firstName,
             last_name:req.body.lastName
@@ -34,7 +42,7 @@ router.post('/save',parseForm,csrfProtect,function(req,resp){
             resp.status(200).send(JSON.stringify({result : true}));
             console.log(entity.dataValues);
         });
-    }else{
+
         resp.status(500).send('Error');
     }
 });
